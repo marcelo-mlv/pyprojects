@@ -22,7 +22,6 @@ def transpose(mat, n):
             temp = tile
             mat[i][j] = trans_tile
             mat[j][i] = temp
-    return mat
 
 
 def mirror(mat, n):
@@ -33,4 +32,3 @@ def mirror(mat, n):
             temp = tile
             mat[i][j] = mirror_tile
             mat[i][n - 1 - j] = temp
-    return mat

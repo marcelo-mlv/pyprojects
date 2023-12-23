@@ -70,7 +70,7 @@ class Board:
         self.slide_left()
         self.merge()
 
-    def move_tiles(self, char):
+    def move_tiles(self, grid, char):
         """
             Moving Logic: It's easier to program the moving logic to one side only, in this case, left,
             and use some matrix operations (transpose and mirror vertically) in order to move
@@ -82,19 +82,19 @@ class Board:
         if char == 'a':
             self.move_left()
         if char == 'w':
-            self.grid = mt.transpose(self.grid, self.size)
+            mt.transpose(grid, self.size)
             self.move_left()
-            self.grid = mt.transpose(self.grid, self.size)
+            mt.transpose(grid, self.size)
         if char == 'd':
-            self.grid = mt.mirror(self.grid, self.size)
+            mt.mirror(grid, self.size)
             self.move_left()
-            self.grid = mt.mirror(self.grid, self.size)
+            mt.mirror(grid, self.size)
         if char == 's':
-            self.grid = mt.transpose(self.grid, self.size)
-            self.grid = mt.mirror(self.grid, self.size)
+            mt.transpose(grid, self.size)
+            mt.mirror(grid, self.size)
             self.move_left()
-            self.grid = mt.mirror(self.grid, self.size)
-            self.grid = mt.transpose(self.grid, self.size)
+            mt.mirror(grid, self.size)
+            mt.transpose(grid, self.size)
 
     def new_turn(self):
         # Print the board
@@ -109,7 +109,7 @@ class Board:
 
         # Move the tiles
         char = get_char()
-        self.move_tiles(char)
+        self.move_tiles(self.grid, char)
 
         empty_tiles = mt.get_zeros(self.grid, self.size)
         rndtile = random.choice(empty_tiles)
