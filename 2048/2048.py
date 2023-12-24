@@ -2,6 +2,17 @@ import boardclass
 import os
 
 
+def get_y_n():
+    """
+    A simple function that receives an input and returns it
+    """
+    char = input()
+    while char not in ['Y', 'N', 'y', 'n']:
+        print("[ It's Y or N bro, come on ]\n")
+        char = input()
+    return char
+
+
 print("This is a project based on the game 2048.\n")
 print("Use w, a, s, d to move the tiles accordingly.\n")
 os.system('pause')
@@ -20,10 +31,8 @@ while not over:
         if not lose:
             os.system("cls")
     print("[ Game over :( ]\n")
-    print("[ Continue? Y/N ]\n")
-    x = input()
-    while x not in ['Y', 'N', 'y', 'n']:
-        print("[ It's Y or N bro, come on ]\n")
-        x = input()
+    time.sleep(1)
+    print("[ Play again? Y/N ]\n")
+    x = get_y_n()
     if x in ['N', 'n']:
         over = True
