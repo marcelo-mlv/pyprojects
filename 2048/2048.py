@@ -20,8 +20,7 @@ os.system('pause')
 # It's a 4x4 grid by default
 game = boardclass.Board(4, 2048)
 
-over = False
-while not over:
+while True:
     os.system("cls")
     print("Press w, a, s or d and then enter! Das it, probably\n\n")
     game.start_board()
@@ -35,4 +34,4 @@ while not over:
     print("[ Play again? Y/N ]\n")
     x = get_y_n()
     if x in ['N', 'n']:
-        over = True
+        break
