@@ -7,7 +7,7 @@ print("Use w, a, s, d to move the tiles accordingly.\n")
 os.system('pause')
 
 # It's a 4x4 grid by default
-game = boardclass.Board(4)
+game = boardclass.Board(4, 2048)
 
 over = False
 while not over:

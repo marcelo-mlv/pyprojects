@@ -1,6 +1,7 @@
 import random
 import matrix as mt
 import copy
+import os
 
 
 def get_char(array):
@@ -13,11 +14,13 @@ def get_char(array):
 
 class Board:
 
-    def __init__(self, size):
+    def __init__(self, size, wnum):
         """
         size: grid size
+        wnum: number needed to achieve victory
         """
         self.size = size
+        self.wnum = wnum
         self.grid = []
 
     def print_board(self, grid):
@@ -130,7 +133,32 @@ class Board:
                 available_moves.append(direction)
         return available_moves
 
-    def new_turn(self):
+    def check_win_condition(self, grid):
+        """
+            Checks if there's a 2048 tile in the grid (win condition).
+            Once beat, the player can play the game endlessly, inevitably losing afterwards.
+
+            0: Continue
+            1: Loss
+            2: Victory
+        """
+        for row in range(self.size):
+            for col in range(self.size):
+                if grid[row][col] == self.wnum:
+                    os.system('cls')
+                    self.print_board(self.grid)
+                    return 2
+        return 0
+
+    def new_turn(self, endless):
+        """
+        0: Continue
+        1: Loss
+        2: Victory
+
+        If the player hasn't won the game, this method will always return 0, except in a loss condition.
+        If the player has already won the game (endless mode), it will always return 2, except in a loss condition.
+        """
         # Print the board
         self.print_board(self.grid)
 
@@ -141,7 +169,7 @@ class Board:
 
         # If there are no empty tiles left AND there are no possible moves (game over)
         if not empty_tiles and not available_directions:
-            return True
+            return 1
 
         # Move the tiles
         char = get_char(available_directions)
@@ -151,4 +179,8 @@ class Board:
         rndtile = random.choice(empty_tiles)
         self.generate_tile(rndtile)
 
-        return False
+        if not endless:
+            status = self.check_win_condition(self.grid)
+            return status
+
+        return 2
