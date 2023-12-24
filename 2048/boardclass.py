@@ -2,9 +2,9 @@ import random
 import matrix as mt
 
 
-def get_char():
+def get_char(array):
     char = input()
-    while char not in ['w', 'a', 's', 'd']:
+    while char not in array:
         print("[ Nahh, press another key ]\n")
         char = input()
     return char
@@ -19,14 +19,14 @@ class Board:
         self.size = size
         self.grid = []
 
-    def print_board(self):
+    def print_board(self, grid):
         for row in range(self.size):
             print('[ ', end='')
             for col in range(self.size):
-                if self.grid[row][col] == 0:
+                if grid[row][col] == 0:
                     tile = ' '
                 else:
-                    tile = self.grid[row][col]
+                    tile = grid[row][col]
                 print(tile, end=' ')
                 if col != self.size-1:
                     print('-', end=' ')
@@ -113,7 +113,7 @@ class Board:
 
     def new_turn(self):
         # Print the board
-        self.print_board()
+        self.print_board(self.grid)
 
         # Checking if there are empty tiles before a move
         empty_tiles = mt.get_zeros(self.grid, self.size)
@@ -123,7 +123,7 @@ class Board:
             return True
 
         # Move the tiles
-        char = get_char()
+        char = get_char(available_directions)
         self.move_tiles(self.grid, char)
 
         empty_tiles = mt.get_zeros(self.grid, self.size)
