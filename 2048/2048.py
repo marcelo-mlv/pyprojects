@@ -49,6 +49,7 @@ while True:
 
     condition = play_game(game, 0, False)
 
+    # Win condition
     if condition == 2:
 
         print("[ WHAT?? You win? ]")
@@ -58,6 +59,8 @@ while True:
         print("[ Would you like to continue? Y/N ]")
 
         ans = get_y_n()
+
+        # Endless mode
         if ans in ['y', 'Y']:
             os.system('cls')
             print('[ Endless Mode ]\n')
@@ -65,6 +68,7 @@ while True:
         else:
             break
 
+    # Loss condition
     print("[ Game over :( ]\n")
     time.sleep(1)
     print("[ Play again? Y/N ]\n")
