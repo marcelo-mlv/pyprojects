@@ -1,5 +1,6 @@
 import random
 import matrix as mt
+import copy
 
 
 def get_char(array):
@@ -111,6 +112,24 @@ class Board:
             mt.mirror(grid, self.size)
             mt.transpose(grid, self.size)
 
+    def test_moves(self):
+        """
+            When there are no tiles left (endgame), it's important to see if there are
+            any moves available from the merging mechanic. If not, it's game over.
+
+            Thus, this function will clone the current grid and move it in all 4 directions,
+            checking if there is any direction that will keep the game going.
+
+            returns the list of possible directions to move.
+        """
+        available_moves = []
+        for direction in ['w', 'a', 's', 'd']:
+            grid_clone = copy.deepcopy(self.grid)
+            self.move_tiles(grid_clone, direction)
+            if grid_clone != self.grid:
+                available_moves.append(direction)
+        return available_moves
+
     def new_turn(self):
         # Print the board
         self.print_board(self.grid)
@@ -118,8 +137,10 @@ class Board:
         # Checking if there are empty tiles before a move
         empty_tiles = mt.get_zeros(self.grid, self.size)
 
-        # If there are no empty tiles left (game over)
-        if not empty_tiles:
+        available_directions = self.test_moves()
+
+        # If there are no empty tiles left AND there are no possible moves (game over)
+        if not empty_tiles and not available_directions:
             return True
 
         # Move the tiles
