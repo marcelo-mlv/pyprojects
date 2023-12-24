@@ -33,9 +33,24 @@ class Board:
             print(']')
         print()
 
+    def generate_tile(self, tile_pos):
+        """
+        Odds of generating 2: 90%
+        Odds of generating 4: 10%
+        """
+        num = [2]*9 + [4]
+        rndnum = random.choice(num)
+
+        # Place a random number on a random tile
+        self.grid[tile_pos[0]][tile_pos[1]] = rndnum
+
     def start_board(self):
         print("[ New game ]\n")
         self.grid = [[0 for _ in range(self.size)] for _ in range(self.size)]
+
+        empty_tiles = mt.get_zeros(self.grid, self.size)
+        rndtile = random.choice(empty_tiles)
+        self.generate_tile(rndtile)
 
     def merge(self, grid):
         for row in range(self.size):
@@ -113,13 +128,6 @@ class Board:
 
         empty_tiles = mt.get_zeros(self.grid, self.size)
         rndtile = random.choice(empty_tiles)
-
-        # Odds of generating 2: 90%
-        # Odds of generating 4: 10%
-        num = [2]*9 + [4]
-        rndnum = random.choice(num)
-
-        # Place a random number on a random tile
-        self.grid[rndtile[0]][rndtile[1]] = rndnum
+        self.generate_tile(rndtile)
 
         return False
