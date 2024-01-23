@@ -1,9 +1,16 @@
+symbols = {'p': '♙', 'P': '♟',
+           'b': '♗', 'B': '♝',
+           'r': '♖', 'R': '♜',
+           'n': '♘', 'N': '♞',
+           'q': '♕', 'Q': '♛',
+           'k': '♔', 'K': '♚'}
+
 class Board:
     def __init__(self, fen):
-        self.board = [['+' for j in range(8)] for i in range(8)]
+        self.board = [['·' for j in range(8)] for i in range(8)]
         self.fen = fen
-        self.files = '1 2 3 4 5 6 7 8'.split()
-        self.ranks = 'a b c d e f g h'
+        self.ranks = '8 7 6 5 4 3 2 1'.split()
+        self.files = 'a b c d e f g h'
 
     def read_fenstring(self):
         positions = self.fen.split('/')
@@ -18,10 +25,21 @@ class Board:
         # print('POSITIONS:', positions)
         # print('OTHERS:', others)
 
+        for rankinfo in positions:
+            rankno = positions.index(rankinfo)
+            fileindex = 0
+            for char in rankinfo:
+                if char.isdigit():
+                    num = int(char)
+                    fileindex += num
+                else:
+                    self.board[rankno][fileindex] = symbols[char]
+                fileindex += 1
+
     def print_board(self):
         for i in range(8):
-            print(self.files[i], end='')
+            print(self.ranks[i], end=' ')
             for j in range(8):
-                print(' ', end=self.board[i][j])
+                print(self.board[i][j], end=' ')
             print()
-        print(' ', self.ranks, end=' ')
+        print(' ', self.files)
