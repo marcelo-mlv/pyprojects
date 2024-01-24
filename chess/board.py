@@ -11,7 +11,7 @@ symbols = {'p': '♙', 'P': '♟',
 
 class Board:
     def __init__(self, fen):
-        self.board = [['·' for j in range(8)] for i in range(8)]
+        self.board = [['·' for _ in range(8)] for _ in range(8)]
         self.fen = fen
         self.ranks = '8 7 6 5 4 3 2 1'.split()
         self.files = 'a b c d e f g h'
@@ -45,15 +45,15 @@ class Board:
         # print('OTHERS:', others)
 
         for rankinfo in positions:
-            rankno = positions.index(rankinfo)
+            rankindex = positions.index(rankinfo)
             fileindex = 0
             for char in rankinfo:
                 if char.isdigit():
                     num = int(char)
                     fileindex += num
                 else:
-                    self.board[rankno][fileindex] = symbols[char]
                     piece = pieces.get_piece(char, self)
+                    self.board[rankindex][fileindex] = symbols[char]
                     self.pieces.append(piece)
                 fileindex += 1
 
