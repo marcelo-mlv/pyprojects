@@ -15,6 +15,18 @@ class Board:
         self.turn = 0
 
     def read_fenstring(self):
+        """
+        Starting game FEN: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        r, n, b, q, k, p: black pieces (rook, knight, etc)
+        R, N, B, Q, K, P: white pieces
+        8: 8 empty tiles in the current rank (the whole rank in this case)
+        'w': white's turn
+        'KQkq': Castling availability
+        '-': No En Passant possible
+        '0': 0 moves since a pawn moved or a piece was captured
+        '1': 1st full move (increases after each black's move)
+        """
+
         positions = self.fen.split('/')
 
         others = positions[-1].split(' ')
