@@ -1,3 +1,6 @@
+import pieces
+
+
 symbols = {'p': '♙', 'P': '♟',
            'b': '♗', 'B': '♝',
            'r': '♖', 'R': '♜',
@@ -13,6 +16,7 @@ class Board:
         self.files = 'a b c d e f g h'
         self.dim = 8
         self.turn = 0
+        self.pieces = []
 
     def read_fenstring(self):
         """
@@ -48,6 +52,8 @@ class Board:
                     fileindex += num
                 else:
                     self.board[rankno][fileindex] = symbols[char]
+                    piece = pieces.get_piece(char, self)
+                    self.pieces.append(piece)
                 fileindex += 1
 
     def print_board(self):
