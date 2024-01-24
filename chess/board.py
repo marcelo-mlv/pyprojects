@@ -8,6 +8,7 @@ symbols = {'p': '♙', 'P': '♟',
            'q': '♕', 'Q': '♛',
            'k': '♔', 'K': '♚'}
 
+
 class Board:
     def __init__(self, fen):
         self.board = [['·' for j in range(8)] for i in range(8)]
