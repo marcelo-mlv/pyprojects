@@ -8,6 +8,9 @@ test = board.Board(FEN)
 test.read_fenstring()
 
 for _ in range(3):
+    a = test.get_pieces_pos()
+    for i in test.pieces:
+        print(i, i.pos)
     test.new_turn()
     os.system('pause')
     os.system('cls')
