@@ -11,7 +11,7 @@ symbols = {'p': '♙', 'P': '♟',
 
 class Board:
     def __init__(self, fen):
-        self.board = [['·' for _ in range(8)] for _ in range(8)]
+        self.grid = [['·' for _ in range(8)] for _ in range(8)]
         self.fen = fen
         self.ranks = '8 7 6 5 4 3 2 1'.split()
         self.files = 'a b c d e f g h'
@@ -40,10 +40,6 @@ class Board:
         positions.append(others[0])
         others.remove(others[0])
 
-        # print(self.fen)
-        # print('POSITIONS:', positions)
-        # print('OTHERS:', others)
-
         for rankinfo in positions:
             rankindex = positions.index(rankinfo)
             fileindex = 0
@@ -53,7 +49,7 @@ class Board:
                     fileindex += num
                 else:
                     piece = pieces.get_piece(char, self)
-                    self.board[rankindex][fileindex] = symbols[char]
+                    self.grid[rankindex][fileindex] = symbols[char]
                     self.pieces.append(piece)
                 fileindex += 1
 
@@ -61,7 +57,7 @@ class Board:
         for i in range(self.dim):
             print(self.ranks[i], end=' ')
             for j in range(self.dim):
-                print(self.board[i][j], end=' ')
+                print(self.grid[i][j], end=' ')
             print()
         print(' ', self.files)
         print()
