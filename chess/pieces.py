@@ -16,6 +16,12 @@ class Piece:
             Exception("Piece.get_team: TF is goin on lmao")
 
     def get_available_moves(self, occupied_pos):
+        """
+        For each piece type, there's a code that calculates
+        all possible squares for the piece to move.
+        :param occupied_pos: List of all positions occupied by a piece
+        :return: List of all possible piece positions after the move
+        """
         pass
 
 
@@ -59,7 +65,14 @@ class Queen(Piece):
     pass
 
 
-def generate_new_piece(char, board, pos):
+def generate_new_piece(char, pos):
+    """
+    Generates a new piece on the board.
+    It is called before the game starts according to the FEN string characters
+    :param char: FEN string char
+    :param pos: two element list of the new piece's coordinates
+    :return: Piece object
+    """
     newpiece = None
     if char == 'b':
         newpiece = Bishop('b')
@@ -86,7 +99,6 @@ def generate_new_piece(char, board, pos):
     elif char == 'Q':
         newpiece = Queen('w')
     else:
-        Exception('pieces.get_piece: bruh wat')
+        Exception('pieces.generate_new_piece: bruh wat')
     newpiece.setpos(pos)
-    board.pieces.append(newpiece)
     return newpiece

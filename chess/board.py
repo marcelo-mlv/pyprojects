@@ -75,7 +75,7 @@ class Board:
                     fileindex += num
                 else:
                     self.grid[rankindex][fileindex] = symbols[char]
-                    piece = pieces.generate_new_piece(char, self, [rankindex, fileindex])
+                    piece = pieces.generate_new_piece(char, [rankindex, fileindex])
                     self.pieces.append(piece)
                 fileindex += 1
 
@@ -117,6 +117,11 @@ class Board:
         Exception('Couldnt find the piece what')
 
     def get_user_move(self, moving_piece):
+        """
+        Gets the input from user and checks if it is a viable piece movement
+        :param moving_piece: a pointer to the current moving piece
+        :return: 2-element list of the piece position with respect to index notation
+        """
         inputpos = input()
         w, b = self.get_pieces_pos()
         occupied_squares = w + b
@@ -159,6 +164,10 @@ class Board:
         return currentpiece, piecepos
 
     def new_turn(self):
+        """
+        The main function that handles what happens in a turn of chess
+        (moving, capturing, checking, etc)
+        """
         color_turn = self.get_color_turn()
         print('[ {} move ]\n'.format(color_turn))
         self.print_board()
