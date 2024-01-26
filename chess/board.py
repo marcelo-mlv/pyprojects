@@ -29,7 +29,7 @@ def reconvert_coords(coord):
     for instance, "[4, 7]" -> "H4".
     :return: list containing the converted coordinates
     """
-    fileindex, rankindex = coord
+    rankindex, fileindex = coord
     fileindex = chr(ord('A') + fileindex)
     rankindex = 8 - int(rankindex)
     return str(fileindex) + str(rankindex)
