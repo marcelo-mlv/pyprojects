@@ -43,7 +43,7 @@ class Queen(Piece):
     pass
 
 
-def get_piece(char, board, pos):
+def generate_new_piece(char, board, pos):
     newpiece = None
     if char == 'b':
         newpiece = Bishop('b')

@@ -38,7 +38,7 @@ class Board:
         self.grid = [['·' for _ in range(8)] for _ in range(8)]
         self.fen = fen
         self.ranks = '8 7 6 5 4 3 2 1'.split()
-        self.files = 'a b c d e f g h'
+        self.files = 'A B C D E F G H'
         self.dim = 8
         self.turn = 0
         self.pieces = []
@@ -73,7 +73,7 @@ class Board:
                     fileindex += num
                 else:
                     self.grid[rankindex][fileindex] = symbols[char]
-                    piece = pieces.get_piece(char, self, [rankindex, fileindex])
+                    piece = pieces.generate_new_piece(char, self, [rankindex, fileindex])
                     self.pieces.append(piece)
                 fileindex += 1
 
