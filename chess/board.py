@@ -1,4 +1,6 @@
 import pieces
+import copy
+import os
 
 
 symbols = {'p': '♙', 'P': '♟',
@@ -114,12 +116,30 @@ class Board:
                 return element
         Exception('Couldnt find the piece what')
 
-    def new_turn(self):
-        color_turn = self.get_color_turn()
-        print('[ {} move ]\n'.format(color_turn))
-        self.print_board()
-        print('Choose a piece by typing its position in the board (i.e. E2, F3, G4)\n\n')
+    def get_user_move(self, moving_piece):
+        inputpos = input()
+        w, b = self.get_pieces_pos()
+        occupied_squares = w + b
+        available_squares = moving_piece.get_available_moves(occupied_squares)
+        while True:
+            while len(inputpos) != 2 or inputpos[0] not in 'A B C D E F G H'.split() or \
+                    inputpos[1] not in '1 2 3 4 5 6 7 8'.split():
+                print('type it correctly bruh')
+                inputpos = input()
+            movepos = convert_coords(inputpos)
+            if movepos not in available_squares:
+                print('nahhh cant move it there :/')
+                inputpos = input()
+            else:
+                break
+        return movepos
 
+    def get_user_pos(self, team):
+        """
+        Gets the input from user and checks if it is a viable position in the board
+        :param team: 'w' or 'b', regarding the current turn
+        :return: 2-element list of the piece position with respect to index notation
+        """
         whitespaces, blackspaces = self.get_pieces_pos()
         inputpos = input()
         while True:
@@ -131,9 +151,32 @@ class Board:
             if (team == 'w' and piecepos not in whitespaces) or \
                     (team == 'b' and piecepos not in blackspaces):
                 print('not an actual piece position :/')
+                inputpos = input()
             else:
                 currentpiece = self.find_piece(piecepos)
                 print(currentpiece, 'chosen')
                 break
+        return currentpiece, piecepos
+
+    def new_turn(self):
+        color_turn = self.get_color_turn()
+        print('[ {} move ]\n'.format(color_turn))
+        self.print_board()
+        print('Choose a piece by typing its position in the board (i.e. E2, F3, G4)\n\n')
+
+        currentpiece, piecepos = self.get_user_pos(color_turn.lower()[0])
+
+        os.system('pause')
+        os.system('cls')
+        print('[ {} move ]\n'.format(color_turn))
+        print('Chosen piece position:', reconvert_coords(piecepos))
+        self.print_board()
+        print('Now type its final position:')
+        finalpos = self.get_user_move(currentpiece)
+
+        currentpiece.setpos(finalpos)
+        temp = copy.deepcopy(self.grid[piecepos[0]][piecepos[1]])
+        self.grid[piecepos[0]][piecepos[1]] = '·'
+        self.grid[finalpos[0]][finalpos[1]] = temp
 
         self.turn += 1

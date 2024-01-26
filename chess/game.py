@@ -7,9 +7,7 @@ test = board.Board(FEN)
 
 test.read_fenstring()
 
-for _ in range(3):
-    for i in test.pieces:
-        print(i, i.pos)
+while True:
     test.new_turn()
     os.system('pause')
     os.system('cls')

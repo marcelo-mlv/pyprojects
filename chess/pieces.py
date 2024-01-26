@@ -24,7 +24,23 @@ class King(Piece):
 
 
 class Pawn(Piece):
-    pass
+    def get_available_moves(self, occupied_pos):
+        if self.team == 'w':
+            direction = -1
+        else:
+            direction = 1
+        rankindex, fileindex = self.pos
+
+        move1 = [rankindex + direction, fileindex]
+        move2 = [rankindex + 2*direction, fileindex]
+        possible_moves = []
+
+        if move1 not in occupied_pos:
+            possible_moves.append(move1)
+            if move2 not in occupied_pos and self.first_move:
+                possible_moves.append(move2)
+        self.first_move = False
+        return possible_moves
 
 
 class Rook(Piece):
