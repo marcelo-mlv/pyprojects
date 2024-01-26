@@ -121,19 +121,18 @@ class Board:
         print('Choose a piece by typing its position in the board (i.e. E2, F3, G4)\n\n')
 
         whitespaces, blackspaces = self.get_pieces_pos()
-        piecepos = input()
+        inputpos = input()
         while True:
-            while len(piecepos) != 2 or piecepos[0] not in 'A B C D E F G H'.split() or\
-                    piecepos[1] not in '1 2 3 4 5 6 7 8'.split():
+            while len(inputpos) != 2 or inputpos[0] not in 'A B C D E F G H'.split() or \
+                    inputpos[1] not in '1 2 3 4 5 6 7 8'.split():
                 print('type it correctly bruh')
-                piecepos = input()
-            inputpos = convert_coords(piecepos)
-            if (color_turn[0].lower() == 'w' and inputpos not in whitespaces) or\
-                    (color_turn[0].lower() == 'b' and inputpos not in blackspaces):
+                inputpos = input()
+            piecepos = convert_coords(inputpos)
+            if (team == 'w' and piecepos not in whitespaces) or \
+                    (team == 'b' and piecepos not in blackspaces):
                 print('not an actual piece position :/')
-                piecepos = input()
             else:
-                currentpiece = self.find_piece(inputpos)
+                currentpiece = self.find_piece(piecepos)
                 print(currentpiece, 'chosen')
                 break
 
