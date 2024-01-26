@@ -21,6 +21,18 @@ def convert_coords(coord):
     return [x, y]
 
 
+def reconvert_coords(coord):
+    """
+    It does the opposite algorithm
+    for instance, "[4, 7]" -> "H4".
+    :return: list containing the converted coordinates
+    """
+    fileindex, rankindex = coord
+    fileindex = chr(ord('A') + fileindex)
+    rankindex = 8 - int(rankindex)
+    return str(fileindex) + str(rankindex)
+
+
 class Board:
     def __init__(self, fen):
         self.grid = [['·' for _ in range(8)] for _ in range(8)]
