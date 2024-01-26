@@ -116,16 +116,13 @@ class Board:
                 return element
         Exception('Couldnt find the piece what')
 
-    def get_user_move(self, moving_piece):
+    def get_user_move(self, available_squares):
         """
         Gets the input from user and checks if it is a viable piece movement
-        :param moving_piece: a pointer to the current moving piece
+        :param available_squares: list of squares the piece can go to
         :return: 2-element list of the piece position with respect to index notation
         """
         inputpos = input()
-        w, b = self.get_pieces_pos()
-        occupied_squares = w + b
-        available_squares = moving_piece.get_available_moves(occupied_squares)
         while True:
             while len(inputpos) != 2 or inputpos[0] not in 'A B C D E F G H'.split() or \
                     inputpos[1] not in '1 2 3 4 5 6 7 8'.split():
@@ -159,7 +156,7 @@ class Board:
                 inputpos = input()
             else:
                 currentpiece = self.find_piece(piecepos)
-                print(currentpiece, 'chosen')
+                print(currentpiece, 'chosen\n')
                 break
         return currentpiece, piecepos
 
@@ -169,11 +166,20 @@ class Board:
         (moving, capturing, checking, etc)
         """
         color_turn = self.get_color_turn()
-        print('[ {} move ]\n'.format(color_turn))
-        self.print_board()
-        print('Choose a piece by typing its position in the board (i.e. E2, F3, G4)\n\n')
-
-        currentpiece, piecepos = self.get_user_pos(color_turn.lower()[0])
+        while True:
+            print('[ {} move ]\n'.format(color_turn))
+            self.print_board()
+            print('Choose a piece by typing its position in the board (i.e. E2, F3, G4)\n\n')
+            currentpiece, piecepos = self.get_user_pos(color_turn.lower()[0])
+            w, b = self.get_pieces_pos()
+            occupied_squares = w + b
+            available_squares = currentpiece.get_available_moves(occupied_squares)
+            if available_squares == []:
+                print('[ That piece has nowhere to go, choose another one ]\n')
+                os.system('pause')
+                os.system('cls')
+                continue
+            break
 
         os.system('pause')
         os.system('cls')
@@ -181,7 +187,7 @@ class Board:
         print('Chosen piece position:', reconvert_coords(piecepos))
         self.print_board()
         print('Now type its final position:')
-        finalpos = self.get_user_move(currentpiece)
+        finalpos = self.get_user_move(available_squares)
 
         currentpiece.setpos(finalpos)
         temp = copy.deepcopy(self.grid[piecepos[0]][piecepos[1]])
