@@ -5,64 +5,132 @@ class Piece:
         self.first_move = True
 
     def setpos(self, newpos):
+        """
+        Set a new value to the piece's position attribute
+        :param newpos: 2-element list
+        """
         self.pos = newpos
-
-    def get_team(self):
-        if self.team == 'w':
-            return 'White'
-        elif self.team == 'b':
-            return 'Black'
-        else:
-            Exception("Piece.get_team: TF is goin on lmao")
 
     def get_available_moves(self, occupied_pos):
         """
         For each piece type, there's a code that calculates
         all possible squares for the piece to move.
-        :param occupied_pos: List of all positions occupied by a piece
+        :param occupied_pos: List of all positions occupied by all pieces
         :return: List of all possible piece positions after the move
         """
         pass
 
+    def get_moves_in_direction(self, direction, occupied_pos, possible_moves):
+        """
+        Auxiliary function to get_available_moves method, used for Bishop, Rook and Queen.
+        This method appends squares in a certain direction until it reaches the board limit or reaches another piece.
+        For instance, it will search for all squares in the direction [1,0] when the piece is a rook or a queen,
+        and [1,1] incase of a bishop.
+        :param direction: 2-element list
+        :param occupied_pos: list of 2-element lists
+        :param possible_moves: list of 2-element lists
+        """
+        i, j = direction
+        x, y = self.pos
+        while [x + i, y + j] not in occupied_pos and not check_out_of_bounds([x + i, y + j]):
+            possible_moves.append([x + i, y + j])
+            i += direction[0]
+            j += direction[1]
+
 
 class King(Piece):
-    pass
+    def get_available_moves(self, occupied_pos):
+        possible_moves = []
+        x, y = self.pos
+        for i in [-1, 0, 1]:
+            for j in [-1, 0, 1]:
+                new_move = [x + i, y + j]
+                if new_move not in occupied_pos and not check_out_of_bounds(new_move):
+                    possible_moves.append(new_move)
+        self.first_move = False
+        return possible_moves
 
 
 class Pawn(Piece):
     def get_available_moves(self, occupied_pos):
+        possible_moves = []
+
         if self.team == 'w':
             direction = -1
         else:
             direction = 1
         rankindex, fileindex = self.pos
 
-        move1 = [rankindex + direction, fileindex]
-        move2 = [rankindex + 2*direction, fileindex]
-        possible_moves = []
+        pos1 = [rankindex + direction, fileindex]
+        pos2 = [rankindex + 2*direction, fileindex]
 
-        if move1 not in occupied_pos:
-            possible_moves.append(move1)
-            if move2 not in occupied_pos and self.first_move:
-                possible_moves.append(move2)
+        if pos1 not in occupied_pos:
+            possible_moves.append(pos1)
+            if pos2 not in occupied_pos and self.first_move:
+                possible_moves.append(pos2)
         self.first_move = False
         return possible_moves
 
 
 class Rook(Piece):
-    pass
+    def get_available_moves(self, occupied_pos):
+        possible_moves = []
+        for direction in [[0, 1], [1, 0], [0, -1], [-1, 0]]:
+            self.get_moves_in_direction(direction, occupied_pos, possible_moves)
+        self.first_move = False
+        return possible_moves
 
 
 class Knight(Piece):
-    pass
+    def get_available_moves(self, occupied_pos):
+        possible_moves = []
+        x, y = self.pos
+
+        for direction in [[1, 2], [-1, 2], [1, -2], [-1, -2]]:
+            i, j = direction
+            pos1 = [x + i, y + j]
+            if pos1 not in occupied_pos and not check_out_of_bounds(pos1):
+                possible_moves.append(pos1)
+            pos2 = [x + j, y + i]
+            if pos2 not in occupied_pos and not check_out_of_bounds(pos2):
+                possible_moves.append(pos2)
+
+        self.first_move = False
+        return possible_moves
 
 
 class Bishop(Piece):
-    pass
+    def get_available_moves(self, occupied_pos):
+        possible_moves = []
+
+        for direction in [[1, 1], [1, -1], [-1, 1], [-1, -1]]:
+            self.get_moves_in_direction(direction, occupied_pos, possible_moves)
+
+        self.first_move = False
+        return possible_moves
 
 
 class Queen(Piece):
-    pass
+    def get_available_moves(self, occupied_pos):
+        possible_moves = []
+        for direction in [[0, 1], [1, 0], [0, -1], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]]:
+            self.get_moves_in_direction(direction, occupied_pos, possible_moves)
+
+        self.first_move = False
+        return possible_moves
+
+
+def check_out_of_bounds(pos):
+    """
+    Checks if a given position on the board is out of bounds
+    :param pos: 2-element list
+    :return: Boolean
+    """
+    rankindex, fileindex = pos
+    possible_coords = [0, 1, 2, 3, 4, 5, 6, 7]
+    if rankindex in possible_coords and fileindex in possible_coords:
+        return False
+    return True
 
 
 def generate_new_piece(char, pos):

@@ -156,7 +156,6 @@ class Board:
                 inputpos = input()
             else:
                 currentpiece = self.find_piece(piecepos)
-                print(currentpiece, 'chosen\n')
                 break
         return currentpiece, piecepos
 
@@ -166,27 +165,26 @@ class Board:
         (moving, capturing, checking, etc)
         """
         color_turn = self.get_color_turn()
+        print('[ {} move ]\n'.format(color_turn))
+        self.print_board()
+        print('Choose a piece by typing its position in the board (i.e. E2, F3, G4)\n')
         while True:
-            print('[ {} move ]\n'.format(color_turn))
-            self.print_board()
-            print('Choose a piece by typing its position in the board (i.e. E2, F3, G4)\n\n')
             currentpiece, piecepos = self.get_user_pos(color_turn.lower()[0])
             w, b = self.get_pieces_pos()
             occupied_squares = w + b
             available_squares = currentpiece.get_available_moves(occupied_squares)
-            if available_squares == []:
-                print('[ That piece has nowhere to go, choose another one ]\n')
-                os.system('pause')
-                os.system('cls')
+
+            if not available_squares:
+                print('[ That piece has nowhere to go, choose another one ]\n') 
                 continue
             break
 
         os.system('pause')
         os.system('cls')
         print('[ {} move ]\n'.format(color_turn))
-        print('Chosen piece position:', reconvert_coords(piecepos))
+        print('[ Chosen piece position:', reconvert_coords(piecepos), ']\n')
         self.print_board()
-        print('Now type its final position:')
+        print('[ Now type its final position ]\n')
         finalpos = self.get_user_move(available_squares)
 
         currentpiece.setpos(finalpos)
