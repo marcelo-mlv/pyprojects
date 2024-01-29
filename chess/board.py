@@ -38,12 +38,12 @@ def reconvert_coords(coord):
 class Board:
     def __init__(self, fen):
         self.grid = [['·' for _ in range(8)] for _ in range(8)]
-        self.fen = fen
+        self.fen = fen  # fenstring used to initiate the board
         self.ranks = '8 7 6 5 4 3 2 1'.split()
         self.files = 'A B C D E F G H'
-        self.dim = 8
-        self.turn = 0
-        self.pieces = []
+        self.dim = 8  # board dimension
+        self.turn = 0  # turn no.
+        self.pieces = []  # list of Piece objects on the board
 
     def read_fenstring(self):
         """
@@ -167,13 +167,13 @@ class Board:
         color_turn = self.get_color_turn()
         print('[ {} move ]\n'.format(color_turn))
         self.print_board()
-        print('Choose a piece by typing its position in the board (i.e. E2, F3, G4)\n')
+        print('[ Choose a piece by typing its position in the board (i.e. E2, F3, G4) ]\n')
         while True:
             currentpiece, piecepos = self.get_user_pos(color_turn.lower()[0])
             w, b = self.get_pieces_pos()
-            possible_moves, capturing_squares = currentpiece.get_available_moves(w, b)
+            moving_squares, capturing_squares = currentpiece.get_all_moves(w, b)
 
-            if not possible_moves + capturing_squares:
+            if not moving_squares + capturing_squares:
                 print('[ That piece has nowhere to go, choose another one ]\n')
                 continue
             break
@@ -184,15 +184,18 @@ class Board:
         print('[ Chosen piece position:', reconvert_coords(piecepos), ']\n')
         self.print_board()
         print('[ Now type its final position ]\n')
-        finalpos = self.get_user_move(possible_moves + capturing_squares)
+        finalpos = self.get_user_move(moving_squares + capturing_squares)
 
         if finalpos in capturing_squares:
+            os.system('cls')
+            print('[ {} move ]\n'.format(color_turn))
             print('[ {} capture at {} ]\n'.format(color_turn, reconvert_coords(finalpos)))
+            self.print_board()
             captured_piece = self.find_piece(finalpos)
             idx = self.pieces.index(captured_piece)
             del self.pieces[idx]
 
-        currentpiece.setpos(finalpos)
+        currentpiece.set_pos(finalpos)
         temp = copy.deepcopy(self.grid[piecepos[0]][piecepos[1]])
         self.grid[piecepos[0]][piecepos[1]] = '·'
         self.grid[finalpos[0]][finalpos[1]] = temp
