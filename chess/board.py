@@ -116,10 +116,10 @@ class Board:
                 return element
         Exception('Couldnt find the piece what')
 
-    def get_user_move(self, available_squares):
+    def get_user_move(self, possible_positions):
         """
         Gets the input from user and checks if it is a viable piece movement
-        :param available_squares: list of squares the piece can go to
+        :param possible_positions: list of squares the piece can go to
         :return: 2-element list of the piece position with respect to index notation
         """
         inputpos = input()
@@ -129,7 +129,7 @@ class Board:
                 print('type it correctly bruh')
                 inputpos = input()
             movepos = convert_coords(inputpos)
-            if movepos not in available_squares:
+            if movepos not in possible_positions:
                 print('nahhh cant move it there :/')
                 inputpos = input()
             else:
@@ -171,11 +171,10 @@ class Board:
         while True:
             currentpiece, piecepos = self.get_user_pos(color_turn.lower()[0])
             w, b = self.get_pieces_pos()
-            occupied_squares = w + b
-            available_squares = currentpiece.get_available_moves(occupied_squares)
+            possible_moves, capturing_squares = currentpiece.get_available_moves(w, b)
 
-            if not available_squares:
-                print('[ That piece has nowhere to go, choose another one ]\n') 
+            if not possible_moves + capturing_squares:
+                print('[ That piece has nowhere to go, choose another one ]\n')
                 continue
             break
 
@@ -185,7 +184,13 @@ class Board:
         print('[ Chosen piece position:', reconvert_coords(piecepos), ']\n')
         self.print_board()
         print('[ Now type its final position ]\n')
-        finalpos = self.get_user_move(available_squares)
+        finalpos = self.get_user_move(possible_moves + capturing_squares)
+
+        if finalpos in capturing_squares:
+            print('[ {} capture at {} ]\n'.format(color_turn, reconvert_coords(finalpos)))
+            captured_piece = self.find_piece(finalpos)
+            idx = self.pieces.index(captured_piece)
+            del self.pieces[idx]
 
         currentpiece.setpos(finalpos)
         temp = copy.deepcopy(self.grid[piecepos[0]][piecepos[1]])
