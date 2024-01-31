@@ -6,6 +6,13 @@ class Piece:
         self.capturing_squares = []  # list of positions the piece can capture
         self.first_move = True
 
+    def set_first_move(self, first_move):
+        """
+        Set a new value to the piece's "First Move" attribute
+        :param first_move: boolean
+        """
+        self.first_move = first_move
+
     def set_pos(self, newpos):
         """
         Set a new value to the piece's position attribute
@@ -71,7 +78,6 @@ class King(Piece):
                 if new_move in enemy_team_places:
                     self.capturing_squares.append(new_move)
 
-        self.first_move = False
         return self.moving_squares, self.capturing_squares
 
 
@@ -101,7 +107,6 @@ class Pawn(Piece):
             if new_move in enemy_team_places:
                 self.capturing_squares.append(new_move)
 
-        self.first_move = False
         return self.moving_squares, self.capturing_squares
 
 
@@ -115,7 +120,6 @@ class Rook(Piece):
         for direction in [[0, 1], [1, 0], [0, -1], [-1, 0]]:
             self.get_moves_in_direction(direction, occupied_places, enemy_team_places)
 
-        self.first_move = False
         return self.moving_squares, self.capturing_squares
 
 
@@ -135,7 +139,6 @@ class Knight(Piece):
             if new_move in enemy_team_places:
                 self.capturing_squares.append(new_move)
 
-        self.first_move = False
         return self.moving_squares, self.capturing_squares
 
 
@@ -149,7 +152,6 @@ class Bishop(Piece):
         for direction in [[1, 1], [1, -1], [-1, 1], [-1, -1]]:
             self.get_moves_in_direction(direction, occupied_places, enemy_team_places)
 
-        self.first_move = False
         return self.moving_squares, self.capturing_squares
 
 
@@ -163,7 +165,6 @@ class Queen(Piece):
         for direction in [[0, 1], [1, 0], [0, -1], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]]:
             self.get_moves_in_direction(direction, occupied_places, enemy_team_places)
 
-        self.first_move = False
         return self.moving_squares, self.capturing_squares
 
 

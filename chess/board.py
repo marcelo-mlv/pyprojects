@@ -274,6 +274,7 @@ class Board:
         temp = copy.deepcopy(self.grid[piecepos[0]][piecepos[1]])
         self.grid[piecepos[0]][piecepos[1]] = '·'
         self.grid[finalpos[0]][finalpos[1]] = temp
+        currentpiece.set_first_move(False)
 
         if finalpos in capturing_squares:
             os.system('cls')
