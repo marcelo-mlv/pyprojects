@@ -44,7 +44,6 @@ class Board:
         self.dim = 8  # board dimension
         self.turn = 0  # turn no.
         self.board_pieces = []  # list of Piece objects on the board
-        self.captured_pieces = []  # list of captured Piece objects
 
     def read_fenstring(self):
         """
@@ -175,11 +174,9 @@ class Board:
                 captured_piece = self.find_piece(movepos)
                 currentpiece.set_pos(movepos)
                 self.board_pieces.remove(captured_piece)
-                self.captured_pieces.append(captured_piece)
                 if team_letter in self.evaluate_check():
                     print('cant do that, own team is in check')
                     self.board_pieces.append(captured_piece)
-                    self.captured_pieces.remove(captured_piece)
                     currentpiece.set_pos(original_pos)
                     continue
                 break
@@ -244,17 +241,14 @@ class Board:
 
             for move in capturing_squares:
                 captured_piece = self.find_piece(move)
-                currentpiece.set_pos(move)
                 self.board_pieces.remove(captured_piece)
-                self.captured_pieces.append(captured_piece)
+                currentpiece.set_pos(move)
                 if team_letter not in self.evaluate_check():
                     possible_move_exists = True
                     self.board_pieces.append(captured_piece)
-                    self.captured_pieces.remove(captured_piece)
                     currentpiece.set_pos(original_pos)
                     break
                 self.board_pieces.append(captured_piece)
-                self.captured_pieces.remove(captured_piece)
                 currentpiece.set_pos(original_pos)
 
             if possible_move_exists:
