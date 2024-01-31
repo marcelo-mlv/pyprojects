@@ -2,8 +2,8 @@ class Piece:
     def __init__(self, team):
         self.team = team  # string: 'w' or 'b'
         self.pos = []  # current position on the board
-        self.moving_squares = []  # positions which the piece can move to without capturing
-        self.capturing_squares = []  # position which the piece can capture
+        self.moving_squares = []  # list of positions the piece can move to without capturing
+        self.capturing_squares = []  # list of positions the piece can capture
         self.first_move = True
 
     def set_pos(self, newpos):
