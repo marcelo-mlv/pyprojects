@@ -117,7 +117,7 @@ class Board:
         for element in self.board_pieces:
             if element.pos == pos:
                 return element
-        Exception('Couldnt find the piece what')
+        return None
 
     def evaluate_check(self):
         """
@@ -139,6 +139,33 @@ class Board:
                         team_in_check.append('w')
 
         return team_in_check
+
+    def evaluate_possible_move(self, currentpiece, moving_squares, capturing_squares, team_letter):
+        """
+        Given a piece and its possible moving/capturing positions, this method evaluates if at least one of its moves
+        don't result in a check against its own team. If so, returns True. Otherwise, False, since all moves the piece
+        are illegal.
+        It is a pin if its team isn't in check. If not, it means the piece can't stop its own team's current check.
+        :return:
+        """
+        original_pos = currentpiece.pos
+
+        for move in moving_squares + capturing_squares:
+            captured_piece = self.find_piece(move)
+            currentpiece.set_pos(move)
+            if captured_piece is not None:
+                self.board_pieces.remove(captured_piece)
+
+            if team_letter not in self.evaluate_check():
+                if captured_piece is not None:
+                    self.board_pieces.append(captured_piece)
+                    currentpiece.set_pos(original_pos)
+                return True
+
+            if captured_piece is not None:
+                self.board_pieces.append(captured_piece)
+            currentpiece.set_pos(original_pos)
+        return False
 
     def get_user_move(self, currentpiece, moving_squares, capturing_squares):
         """
@@ -228,30 +255,7 @@ class Board:
                 print('[ That piece has nowhere to go, choose another one ]\n')
                 continue
 
-            possible_move_exists = False
-            original_pos = currentpiece.pos
-
-            for move in moving_squares:
-                currentpiece.set_pos(move)
-                if team_letter not in self.evaluate_check():
-                    possible_move_exists = True
-                    break
-                currentpiece.set_pos(original_pos)
-            currentpiece.set_pos(original_pos)
-
-            for move in capturing_squares:
-                captured_piece = self.find_piece(move)
-                self.board_pieces.remove(captured_piece)
-                currentpiece.set_pos(move)
-                if team_letter not in self.evaluate_check():
-                    possible_move_exists = True
-                    self.board_pieces.append(captured_piece)
-                    currentpiece.set_pos(original_pos)
-                    break
-                self.board_pieces.append(captured_piece)
-                currentpiece.set_pos(original_pos)
-
-            if possible_move_exists:
+            if self.evaluate_possible_move(currentpiece, moving_squares, capturing_squares, team_letter):
                 break
             else:
                 print('[ This piece cant stop its own team check ]') if team_letter in self.evaluate_check()\
