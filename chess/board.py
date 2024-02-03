@@ -142,9 +142,9 @@ class Board:
 
     def evaluate_possible_move(self, currentpiece, moving_squares, capturing_squares, team_letter):
         """
-        Given a piece and its possible moving/capturing positions, this method evaluates if at least one of its moves
-        don't result in a check against its own team. If so, returns True. Otherwise, False, since all moves the piece
-        are illegal.
+        Given a piece and its possible moving/capturing positions, this method evaluates if at least one of its
+        moves don't result in a check against its own team. If so, returns True. Otherwise, False, since all its
+        moves are illegal.
         It is a pin if its team isn't in check. If not, it means the piece can't stop its own team's current check.
         :return:
         """
@@ -157,9 +157,9 @@ class Board:
                 self.board_pieces.remove(captured_piece)
 
             if team_letter not in self.evaluate_check():
+                currentpiece.set_pos(original_pos)
                 if captured_piece is not None:
                     self.board_pieces.append(captured_piece)
-                    currentpiece.set_pos(original_pos)
                 return True
 
             if captured_piece is not None:
@@ -169,7 +169,8 @@ class Board:
 
     def get_user_move(self, currentpiece, moving_squares, capturing_squares):
         """
-        Gets the input from user and checks if it is a viable piece movement
+        Gets the input from user and checks if it is a legal piece movement,
+        already changing its position in the process
         :param currentpiece: Current piece that's going to move
         :param moving_squares: List of positions the piece can move to
         :param capturing_squares: List of poistions the piece can capture
@@ -195,7 +196,7 @@ class Board:
                     currentpiece.set_pos(original_pos)
                     continue
                 break
-                
+
             # elif movepos in capturing_squares:
             else:
                 captured_piece = self.find_piece(movepos)
@@ -208,6 +209,7 @@ class Board:
                     continue
                 break
 
+        currentpiece.set_first_move(False)
         return movepos
 
     def get_user_pos(self, team):
@@ -272,7 +274,6 @@ class Board:
         temp = copy.deepcopy(self.grid[piecepos[0]][piecepos[1]])
         self.grid[piecepos[0]][piecepos[1]] = '·'
         self.grid[finalpos[0]][finalpos[1]] = temp
-        currentpiece.set_first_move(False)
 
         if finalpos in capturing_squares:
             os.system('cls')
