@@ -1,39 +1,8 @@
-import pieces
 import copy
 import os
 import time
 
-
-symbols = {'p': '♙', 'P': '♟',
-           'b': '♗', 'B': '♝',
-           'r': '♖', 'R': '♜',
-           'n': '♘', 'N': '♞',
-           'q': '♕', 'Q': '♛',
-           'k': '♔', 'K': '♚'}
-
-
-def convert_coords(coord):
-    """
-    Simple function to convert chess coordinates into array indexing
-    for instance, "H4" -> "[4, 7]".
-    :return: list containing the converted coordinates
-    """
-    y, x = coord
-    y = ord(y) - ord('A')
-    x = 8 - int(x)
-    return [x, y]
-
-
-def reconvert_coords(coord):
-    """
-    It does the opposite algorithm
-    for instance, "[4, 7]" -> "H4".
-    :return: list containing the converted coordinates
-    """
-    rankindex, fileindex = coord
-    fileindex = chr(ord('A') + fileindex)
-    rankindex = 8 - int(rankindex)
-    return str(fileindex) + str(rankindex)
+from utils import symbols, convert_coords, reconvert_coords, generate_new_piece
 
 
 class Board:
@@ -76,7 +45,7 @@ class Board:
                     fileindex += num
                 else:
                     self.grid[rankindex][fileindex] = symbols[char]
-                    piece = pieces.generate_new_piece(char, [rankindex, fileindex])
+                    piece = generate_new_piece(char, [rankindex, fileindex])
                     self.board_pieces.append(piece)
                     fileindex += 1
 
@@ -256,8 +225,10 @@ class Board:
 
     def new_turn(self):
         """
-        The main function that handles what happens in a turn of chess
-        (moving, capturing, checking, etc)
+        The main function that the main file calls. It calls every other function, except the read_fenstring one.
+        Also prints most of the output messages regarding what's happening in the turn (checking, capturing, moving)
+        It also returns whether the game is over or not, that first case happening if there's a checkmate or a stalemate
+        :return: Boolean
         """
         game_over = False
         color_turn, opposite_color = self.get_color_turn()
