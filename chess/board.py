@@ -78,7 +78,7 @@ class Board:
                     self.grid[rankindex][fileindex] = symbols[char]
                     piece = pieces.generate_new_piece(char, [rankindex, fileindex])
                     self.board_pieces.append(piece)
-                fileindex += 1
+                    fileindex += 1
 
     def print_board(self):
         for i in range(self.dim):
@@ -312,10 +312,12 @@ class Board:
             capture_msg = '[ {} team capture at {} ]\n\n'.format(color_turn, reconvert_coords(finalpos))
             check_msg = '[ {} team check ]\n\n'.format(color_turn)
             capture_check_msg = '[ {} team capture at {}, check ]\n\n'.format(color_turn, reconvert_coords(finalpos))
+
             msg = capture_check_msg if finalpos in capturing_squares and enemy_letter in self.evaluate_check() else \
                 capture_msg if finalpos in capturing_squares else check_msg if enemy_letter in self.evaluate_check() \
                 else '[ {} team move ]\n\n'.format(color_turn)
             print(msg, end='')
+
             self.print_board()
 
         self.turn += 1
