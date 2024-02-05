@@ -1,6 +1,7 @@
 import pieces
 import copy
 import os
+import time
 
 
 symbols = {'p': '♙', 'P': '♟',
@@ -119,15 +120,33 @@ class Board:
                 return element
         return None
 
+    def evaluate_team_movement(self):
+        """
+        Checks if there is any legal moves for the team that's not playing in the current turn.
+        If there isn't, the game will obviously end, but depending on if the team's king is in check
+        it could end either in a checkmate or a stalemate (draw).
+        :return: boolean
+        """
+        _, enemy_color = self.get_color_turn()
+        enemy_letter = enemy_color.lower()[0]
+        w, b = self.get_pieces_pos()
+
+        for piece in self.board_pieces:
+            if piece.team == enemy_letter:
+                moving_squares, capturing_squares = piece.get_all_moves(w, b)
+                if self.evaluate_possible_move(piece, moving_squares, capturing_squares, enemy_letter):
+                    return True
+        return False
+
     def evaluate_check(self):
         """
         Checks if there is a check given the current pieces' positions on the board.
         It appends 'w' or 'b' to the return value as any piece checks throughout the iteration loop
         :return: str list
         """
+        team_in_check = []
         w, b = self.get_pieces_pos()
 
-        team_in_check = []
         for element in self.board_pieces:
             _, capturing_squares = element.get_all_moves(w, b)
             for square in capturing_squares:
@@ -240,11 +259,12 @@ class Board:
         The main function that handles what happens in a turn of chess
         (moving, capturing, checking, etc)
         """
+        game_over = False
         color_turn, opposite_color = self.get_color_turn()
         team_letter = color_turn.lower()[0]   # 'w' or 'b'
         enemy_letter = opposite_color.lower()[0]   # 'b' or 'w'
 
-        print('[ {} move ]\n'.format(color_turn))
+        print('[ {} team move ]\n'.format(color_turn))
         self.print_board()
         print('[ Choose a piece by typing its position in the board (i.e. E2, F3, G4) ]\n')
 
@@ -266,8 +286,8 @@ class Board:
         os.system('pause')
         os.system('cls')
         print('[ {} move ]\n'.format(color_turn))
-        print('[ Chosen piece position:', reconvert_coords(piecepos), ']\n')
         self.print_board()
+        print('[ Chosen piece position:', reconvert_coords(piecepos), ']\n')
         print('[ Now type its final position ]\n')
         finalpos = self.get_user_move(currentpiece, moving_squares, capturing_squares)
 
@@ -275,17 +295,30 @@ class Board:
         self.grid[piecepos[0]][piecepos[1]] = '·'
         self.grid[finalpos[0]][finalpos[1]] = temp
 
-        if finalpos in capturing_squares:
-            os.system('cls')
-            print('[ {} move ]\n'.format(color_turn))
-            print('[ {} capture at {} ]\n'.format(color_turn, reconvert_coords(finalpos)))
-            self.print_board()
-
-        if enemy_letter in self.evaluate_check():
-            os.system('cls')
-            print('[ {} move ]\n'.format(color_turn))
-            capture_msg = 'capture, ' if finalpos in capturing_squares else ''
-            print('[ {} team {}check ]\n'.format(color_turn, capture_msg))
+        os.system('cls')
+        if not self.evaluate_team_movement():
+            if self.evaluate_check():
+                print('[ CHECKMATE ]\n')
+                time.sleep(1.2)
+                print('[ {} wins! ]\n'.format(color_turn))
+                self.print_board()
+            else:
+                print('[ STALEMATE ]\n')
+                time.sleep(1.2)
+                print("[ It's a Draw! ]\n".format(color_turn))
+                self.print_board()
+            game_over = True
+        else:
+            capture_msg = '[ {} team capture at {} ]\n\n'.format(color_turn, reconvert_coords(finalpos))
+            check_msg = '[ {} team check ]\n\n'.format(color_turn)
+            capture_check_msg = '[ {} team capture at {}, check ]\n\n'.format(color_turn, reconvert_coords(finalpos))
+            msg = capture_check_msg if finalpos in capturing_squares and enemy_letter in self.evaluate_check() else \
+                capture_msg if finalpos in capturing_squares else check_msg if enemy_letter in self.evaluate_check() \
+                else '[ {} team move ]\n\n'.format(color_turn)
+            print(msg, end='')
             self.print_board()
 
         self.turn += 1
+        os.system('pause')
+        os.system('cls')
+        return game_over
