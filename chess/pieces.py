@@ -1,4 +1,4 @@
-from utils import check_out_of_bounds
+import utils
 
 
 class Piece:
@@ -47,7 +47,7 @@ class Piece:
         x, y = self.pos
         if [x + i, y + j] in enemy_team_places:
             self.capturing_squares.append([x + i, y + j])
-        while [x + i, y + j] not in occupied_places and not check_out_of_bounds([x + i, y + j]):
+        while [x + i, y + j] not in occupied_places and not utils.check_out_of_bounds([x + i, y + j]):
             self.moving_squares.append([x + i, y + j])
             i += direction[0]
             j += direction[1]
@@ -76,7 +76,7 @@ class King(Piece):
         for i in [-1, 0, 1]:
             for j in [-1, 0, 1]:
                 new_move = [x + i, y + j]
-                if new_move not in occupied_places and not check_out_of_bounds(new_move):
+                if new_move not in occupied_places and not utils.check_out_of_bounds(new_move):
                     self.moving_squares.append(new_move)
                 if new_move in enemy_team_places:
                     self.capturing_squares.append(new_move)
@@ -137,7 +137,7 @@ class Knight(Piece):
         for direction in [[1, 2], [-1, 2], [1, -2], [-1, -2], [2, 1], [-2, 1], [2, -1], [-2, -1]]:
             i, j = direction
             new_move = [x + i, y + j]
-            if new_move not in occupied_places and not check_out_of_bounds(new_move):
+            if new_move not in occupied_places and not utils.check_out_of_bounds(new_move):
                 self.moving_squares.append(new_move)
             if new_move in enemy_team_places:
                 self.capturing_squares.append(new_move)
