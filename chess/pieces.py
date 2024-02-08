@@ -91,10 +91,8 @@ class Pawn(Piece):
         self.capturing_squares = []
         enemy_team_places = self.get_enemy_team_places(white_places, black_places)
 
-        if self.team == 'w':
-            direction = -1
-        else:
-            direction = 1
+        direction = -1 if self.team == 'w' else 1
+
         rankindex, fileindex = self.pos
 
         new_move1 = [rankindex + direction, fileindex]

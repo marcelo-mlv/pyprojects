@@ -2,18 +2,38 @@ import copy
 import os
 import time
 
-from utils import symbols, convert_coords, reconvert_coords, generate_new_piece
+from utils import symbols, unsymbols, convert_coords, reconvert_coords, generate_new_piece
 
 
 class Board:
+
     def __init__(self, fen):
         self.grid = [['·' for _ in range(8)] for _ in range(8)]
         self.fen = fen  # fenstring used to initiate the board
         self.ranks = '8 7 6 5 4 3 2 1'.split()
         self.files = 'A B C D E F G H'
         self.dim = 8  # board dimension
-        self.turn = 0  # turn no.
+        self.turn = 0  # number of moves in total
+        self.halfmoves = 0  # halfmove counter
         self.board_pieces = []  # list of Piece objects on the board
+        self.en_passant_pos = '-'  # string that contains the position of the pawn that has just moved two squares
+
+    def print_board(self):
+        for i in range(self.dim):
+            print(self.ranks[i], end=' ')
+            for j in range(self.dim):
+                print(self.grid[i][j], end=' ')
+            print()
+        print(' ', self.files)
+        print()
+
+    def get_color_turn(self):
+        """
+        :return: 2 strings: moving team, opposite team
+        """
+        if self.turn % 2 == 0:
+            return 'White', 'Black'
+        return 'Black', 'White'
 
     def read_fenstring(self):
         """
@@ -25,7 +45,7 @@ class Board:
         'KQkq': Castling availability
         '-': No En Passant possible
         '0': 0 moves since a pawn moved or a piece was captured
-        '1': 1st full move (increases after each black's move)
+        '1': 1st full move (increases after each move from black)
         """
 
         positions = self.fen.split('/')
@@ -49,22 +69,37 @@ class Board:
                     self.board_pieces.append(piece)
                     fileindex += 1
 
-    def print_board(self):
-        for i in range(self.dim):
-            print(self.ranks[i], end=' ')
-            for j in range(self.dim):
-                print(self.grid[i][j], end=' ')
-            print()
-        print(' ', self.files)
-        print()
+    def set_fenstring(self):
+        fen = ''
+        for rank in range(self.dim):
+            empty_squares = 0
+            for file in range(self.dim):
+                symbol = self.grid[rank][file]
+                if symbol == '·':
+                    empty_squares += 1
+                else:
+                    if empty_squares != 0:
+                        fen += str(empty_squares)
+                        empty_squares = 0
+                    fen += unsymbols[symbol]
+            fen += str(empty_squares) if empty_squares != 0 else ''
+            fen += '/' if rank != range(self.dim)[-1] else ' '
 
-    def get_color_turn(self):
-        """
-        :return: 2 strings: moving team, opposite team
-        """
-        if self.turn % 2 == 0:
-            return 'White', 'Black'
-        return 'Black', 'White'
+        fen += self.get_color_turn()[0].lower()[0] + ' '
+
+        # Castle
+        fen += 'KQkq '
+
+        # En passant
+        fen += str(self.en_passant_pos.lower()) + ' '
+
+        # Halfmoves
+        fen += str(self.halfmoves) + ' '
+
+        # Fullmove formula
+        fen += str((self.turn/2+1).__trunc__())
+
+        print('FENSTRING:', fen, end='\n\n')
 
     def get_pieces_pos(self):
         """
@@ -83,6 +118,8 @@ class Board:
     def find_piece(self, pos):
         """
         Used for finding a piece given its current position on the board
+        :param pos: list with two ints
+        :return: Piece object, if found.
         """
         for element in self.board_pieces:
             if element.pos == pos:
@@ -134,7 +171,7 @@ class Board:
         moves don't result in a check against its own team. If so, returns True. Otherwise, False, since all its
         moves are illegal.
         It is a pin if its team isn't in check. If not, it means the piece can't stop its own team's current check.
-        :return:
+        :return: Boolean
         """
         original_pos = currentpiece.pos
 
@@ -155,6 +192,21 @@ class Board:
             currentpiece.set_pos(original_pos)
         return False
 
+    def evaluate_en_passant(self, currentpiece, en_passant_square):
+        """
+        Auxiliary function that appends an en passant to the move list if possible
+        :param currentpiece: chosen piece that will move in the current turn
+        :param en_passant_square: Empty list that may contain a pawn's position if conditions are met
+        """
+        if str(type(currentpiece)) == "<class 'pieces.Pawn'>":
+            eprank, epfile = convert_coords(self.en_passant_pos)  # en passant capturable piece rank/file
+            rank, file = currentpiece.pos  # chosen piece's rank/file
+            if eprank == rank:
+                if epfile == file + 1 or epfile == file - 1:
+                    direction = -1 if self.get_color_turn()[0].lower()[0] == 'w' else 1
+                    capturepos = [eprank + direction, epfile]
+                    en_passant_square.append(capturepos)
+
     def get_user_move(self, currentpiece, moving_squares, capturing_squares):
         """
         Gets the input from user and checks if it is a legal piece movement,
@@ -166,6 +218,11 @@ class Board:
         """
         original_pos = currentpiece.pos
         team_letter = self.get_color_turn()[0].lower()[0]
+        en_passant_square = []
+
+        if self.en_passant_pos != '-':
+            self.evaluate_en_passant(currentpiece, en_passant_square)
+
         while True:
             inputpos = input()
             while len(inputpos) != 2 or inputpos[0] not in 'A B C D E F G H'.split() or \
@@ -173,7 +230,7 @@ class Board:
                 print('type it correctly bruh')
                 inputpos = input()
             movepos = convert_coords(inputpos)
-            if movepos not in moving_squares + capturing_squares:
+            if movepos not in moving_squares + capturing_squares + en_passant_square:
                 print('nahhh cant move it there :/')
                 continue
 
@@ -185,9 +242,8 @@ class Board:
                     continue
                 break
 
-            # elif movepos in capturing_squares:
-            else:
-                captured_piece = self.find_piece(movepos)
+            elif movepos in capturing_squares:
+                captured_piece = self.find_piece(movepos)  # for en passant, this line is false
                 currentpiece.set_pos(movepos)
                 self.board_pieces.remove(captured_piece)
                 if team_letter in self.evaluate_check():
@@ -196,6 +252,25 @@ class Board:
                     currentpiece.set_pos(original_pos)
                     continue
                 break
+
+            else:  # En passant
+                eprank, epfile = convert_coords(self.en_passant_pos)
+                captured_piece = self.find_piece([eprank, epfile])
+                currentpiece.set_pos(movepos)
+                self.board_pieces.remove(captured_piece)
+                if team_letter in self.evaluate_check():
+                    print('cant do that, own team is in check')
+                    self.board_pieces.append(captured_piece)
+                    currentpiece.set_pos(original_pos)
+                    continue
+                self.grid[eprank][epfile] = '·'
+                break
+
+        if str(type(currentpiece)) == "<class 'pieces.Pawn'>" and abs(movepos[0] - original_pos[0]) == 2:
+            print(self.en_passant_pos, reconvert_coords(movepos))
+            self.en_passant_pos = reconvert_coords(movepos)
+        else:
+            self.en_passant_pos = '-'
 
         currentpiece.set_first_move(False)
         return movepos
@@ -288,10 +363,15 @@ class Board:
                 capture_msg if finalpos in capturing_squares else check_msg if enemy_letter in self.evaluate_check() \
                 else '[ {} team move ]\n\n'.format(color_turn)
             print(msg, end='')
-
             self.print_board()
+
+        if finalpos in capturing_squares or str(type(currentpiece)) == "<class 'pieces.Pawn'>":
+            self.halfmoves = 0
+        else:
+            self.halfmoves += 1
 
         self.turn += 1
         os.system('pause')
         os.system('cls')
+        self.set_fenstring()
         return game_over
